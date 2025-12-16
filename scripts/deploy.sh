@@ -209,7 +209,9 @@ setup_environment() {
         cp ".env.example" ".env"
         echo -e "   ${YELLOW}⚠️  Copied .env.example → .env (edit with real values!)${NC}"
     else
-        echo -e "   ${YELLOW}⚠️  No .env file. Create one if needed.${NC}"
+        # Create empty .env file so docker-compose doesn't fail
+        touch .env
+        echo -e "   ${YELLOW}⚠️  Created empty .env file${NC}"
     fi
     echo ""
 }

@@ -114,7 +114,7 @@ for PROJECT in $PROJECTS; do
     if [[ "$SHOW_STATUS" == "true" ]]; then
         if [[ -f "${PROJECT_PATH}/docker-compose.yml" ]]; then
             cd "$PROJECT_PATH"
-            STATUS=$(docker compose ps --format "{{.State}}" 2>/dev/null | head -1)
+            STATUS=$(docker-compose ps --format "{{.State}}" 2>/dev/null | head -1)
             
             case "$STATUS" in
                 "running")

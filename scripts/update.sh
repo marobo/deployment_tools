@@ -102,7 +102,7 @@ echo -e "Branch: ${CURRENT_BRANCH}"
 
 if [[ "$RESTART_ONLY" == "true" ]]; then
     echo -e "${GREEN}🔄 Restarting containers...${NC}"
-    docker compose restart
+    docker-compose restart
     echo -e "${GREEN}✅ Restarted${NC}"
 else
     echo -e "${GREEN}📥 Pulling latest changes...${NC}"
@@ -113,7 +113,7 @@ else
     
     if [[ "$BEFORE" == "$AFTER" ]] && [[ "$FORCE_REBUILD" != "true" ]]; then
         echo -e "${YELLOW}   No changes. Restarting...${NC}"
-        docker compose restart
+        docker-compose restart
     else
         if [[ "$BEFORE" != "$AFTER" ]]; then
             echo -e "${GREEN}   New commits:${NC}"
@@ -121,15 +121,15 @@ else
         fi
         
         echo -e "${GREEN}🐳 Rebuilding...${NC}"
-        docker compose down --remove-orphans
+        docker-compose down --remove-orphans
         
         if [[ "$FORCE_REBUILD" == "true" ]]; then
-            docker compose build --no-cache
+            docker-compose build --no-cache
         else
-            docker compose build
+            docker-compose build
         fi
         
-        docker compose up -d
+        docker-compose up -d
     fi
     
     echo -e "${GREEN}✅ Update complete${NC}"
@@ -137,19 +137,19 @@ fi
 
 # Check status
 sleep 2
-STATUS=$(docker compose ps --format "{{.State}}" 2>/dev/null | head -1)
+STATUS=$(docker-compose ps --format "{{.State}}" 2>/dev/null | head -1)
 
 if [[ "$STATUS" == "running" ]]; then
     echo -e "${GREEN}✅ Container running${NC}"
 else
     echo -e "${RED}❌ Container issue${NC}"
-    docker compose logs --tail=10
+    docker-compose logs --tail=10
 fi
 
 if [[ "$SHOW_LOGS" == "true" ]]; then
     echo ""
     echo -e "${CYAN}📋 Recent logs:${NC}"
-    docker compose logs --tail=20
+    docker-compose logs --tail=20
 fi
 
 echo ""
