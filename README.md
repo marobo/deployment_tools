@@ -15,14 +15,14 @@ Simple deployment scripts for Docker + Traefik servers. Deploy any project with 
 ### One-Command Install
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/YOUR_USERNAME/deployment-scripts/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/marobo/deployment_tools/main/install.sh | bash
 ```
 
 ### Manual Install
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/deployment-scripts.git ~/.deploy-tools
-cd ~/.deploy-tools
+git clone https://github.com/marobo/deployment_tools.git ~/deployment_tools
+cd ~/deployment_tools
 ./install.sh
 ```
 
@@ -31,14 +31,14 @@ cd ~/.deploy-tools
 Edit the config file with your settings:
 
 ```bash
-nano ~/.deploy-tools/config.sh
+nano ~/deployment_tools/config.sh
 ```
 
 ### Required Settings
 
 ```bash
 # Where your projects are stored
-PROJECTS_DIR="/home/onorio/projects"
+PROJECTS_DIR="/home/you_username/projects"
 
 # Docker network (must match your Traefik setup)
 TRAEFIK_NETWORK="proxy"
@@ -52,7 +52,7 @@ DO_API_TOKEN="dop_v1_xxxxx"
 ### 🚀 Deploy New Project
 
 ```bash
-deploy --repo git@github.com:user/myapp.git \
+deploy --repo git@github.com:YOU_GIT_USERNAME/myapp.git \
        --subdomain myapp \
        --domain example.com
 ```
@@ -106,7 +106,7 @@ projects --full
 ## Server Structure
 
 ```
-/home/onorio/
+/home/your_username/
 ├── traefik/
 │   └── docker-compose.yml    # Traefik reverse proxy
 └── projects/
@@ -160,7 +160,7 @@ networks:
 Make sure Traefik is running with the `proxy` network:
 
 ```yaml
-# /home/onorio/traefik/docker-compose.yml
+# /home/your_username/traefik/docker-compose.yml
 services:
   traefik:
     image: traefik:v3.0
@@ -200,15 +200,15 @@ docker network create proxy
 3. Add to your config:
 
 ```bash
-# ~/.deploy-tools/config.sh
+# ~/deployment_tools/config.sh
 DO_API_TOKEN="dop_v1_your_token_here"
 ```
 
 ## Updating Deploy Tools
 
 ```bash
-cd ~/.deploy-tools
-git pull origin main
+cd ~/deployment_tools
+git pull origin master
 ./install.sh
 ```
 
@@ -217,7 +217,7 @@ git pull origin main
 ### Container not starting
 
 ```bash
-cd /home/onorio/projects/myapp
+cd /home/your_username/projects/myapp
 docker compose logs -f
 ```
 
@@ -226,7 +226,7 @@ docker compose logs -f
 Wait a few minutes for Let's Encrypt. Check Traefik logs:
 
 ```bash
-cd /home/onorio/traefik
+cd /home/your_username/traefik
 docker compose logs -f
 ```
 

@@ -7,7 +7,7 @@
 # ===========================================
 
 # Where projects are stored on the server
-PROJECTS_DIR="/home/onorio/projects"
+PROJECTS_DIR="/home/your_username/projects"
 
 # Docker network for Traefik
 TRAEFIK_NETWORK="proxy"

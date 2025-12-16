@@ -11,7 +11,7 @@ This document captures the planning conversation and design decisions for this d
 - Multiple projects can be deployed to the same server
 - Server structure:
   ```
-  /home/onorio/
+  /home/your_username/
   ├── traefik/
   │   └── docker-compose.yml
   └── projects/
@@ -58,22 +58,22 @@ This document captures the planning conversation and design decisions for this d
 ### Deploy New Project
 
 ```bash
-deploy --repo git@github.com:user/myapp.git \
+deploy --repo git@github.com:your_git_user_name/myapp.git \
        --subdomain myapp \
-       --domain onorio.dev
+       --domain mainsite.dev
 ```
 
 ### Update Existing Project
 
 ```bash
 # Simple update
-update house_estimator
+update myapp
 
 # Force rebuild
-update house_estimator --rebuild
+update myapp --rebuild
 
 # Just restart
-update house_estimator --restart
+update myapp --restart
 ```
 
 ### List Projects
@@ -147,7 +147,7 @@ projects --full
 ## 📁 Repository Structure
 
 ```
-deployment_scripts/
+deployment_tools/
 ├── install.sh           # One-command installer
 ├── config.example.sh    # Configuration template
 ├── README.md            # User documentation
@@ -173,14 +173,14 @@ deployment_scripts/
 
 ```bash
 # One-liner
-curl -sSL https://raw.githubusercontent.com/USER/deployment-scripts/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/marobo/deployment_tools/main/install.sh | bash
 
 # Manual
-git clone https://github.com/USER/deployment-scripts.git ~/.deploy-tools
-cd ~/.deploy-tools && ./install.sh
+git clone https://github.com/marobo/deployment_tools.git ~/deployment_tools
+cd ~/deployment_tools && ./install.sh
 
 # Configure
-nano ~/.deploy-tools/config.sh
+nano ~/deployment_tools/config.sh
 ```
 
 ---
