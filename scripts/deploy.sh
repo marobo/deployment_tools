@@ -185,6 +185,13 @@ setup_repository() {
         cd "$PROJECT_DIR"
     fi
     
+    # Initialize and update git submodules if any
+    if [[ -f ".gitmodules" ]]; then
+        echo -e "   📦 Initializing git submodules..."
+        git submodule update --init --recursive
+        echo -e "   ${GREEN}✅ Submodules ready${NC}"
+    fi
+    
     echo -e "   ${GREEN}✅ Repository ready${NC}"
     echo ""
 }

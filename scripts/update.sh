@@ -109,6 +109,13 @@ else
     
     BEFORE=$(git rev-parse HEAD 2>/dev/null || echo "none")
     git pull origin "$CURRENT_BRANCH"
+    
+    # Update git submodules if any
+    if [[ -f ".gitmodules" ]]; then
+        echo -e "   📦 Updating git submodules..."
+        git submodule update --init --recursive
+    fi
+    
     AFTER=$(git rev-parse HEAD 2>/dev/null || echo "none")
     
     if [[ "$BEFORE" == "$AFTER" ]] && [[ "$FORCE_REBUILD" != "true" ]]; then
