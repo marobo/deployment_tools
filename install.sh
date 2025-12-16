@@ -83,6 +83,7 @@ create_symlink() {
     echo -e "   ✅ $cmd → $INSTALL_DIR/scripts/$script"
 }
 
+create_symlink "d.sh" "d"
 create_symlink "deploy.sh" "deploy"
 create_symlink "update.sh" "update"
 create_symlink "projects.sh" "projects"
@@ -123,7 +124,8 @@ echo -e "  1. Edit config: ${CYAN}nano $INSTALL_DIR/config.sh${NC}"
 echo -e "  2. Set your PROJECTS_DIR and DO_API_TOKEN"
 echo ""
 echo -e "  ${CYAN}Commands available:${NC}"
-echo -e "  • deploy --help"
+echo -e "  • ${GREEN}d <git-url>${NC}      ← Quick deploy!"
+echo -e "  • deploy --help   ← Full options"
 echo -e "  • update --help"
 echo -e "  • projects --help"
 echo ""

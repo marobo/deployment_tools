@@ -1,9 +1,18 @@
 # 🚀 Deploy Tools
 
-Simple deployment scripts for Docker + Traefik servers. Deploy any project with a single command.
+Deploy any project with a **single command**.
+
+```bash
+d git@github.com:user/myapp.git
+```
+
+That's it. Seriously.
+
+---
 
 ## Features
 
+- ⚡ **One-command deploy** - Just paste your git URL
 - 🐳 **Docker + Traefik** - Automatic container deployment with reverse proxy
 - 🔒 **Auto SSL** - Let's Encrypt certificates via Traefik
 - 📡 **DNS Automation** - Auto-create DigitalOcean DNS records
@@ -49,10 +58,26 @@ DO_API_TOKEN="dop_v1_xxxxx"
 
 ## Usage
 
-### 🚀 Deploy New Project
+### ⚡ Quick Deploy (Recommended)
 
 ```bash
-deploy --repo git@github.com:YOU_GIT_USERNAME/myapp.git \
+# Just the repo URL - subdomain auto-detected from repo name
+d git@github.com:user/myapp.git
+
+# Or specify a custom subdomain
+d git@github.com:user/myapp.git api
+```
+
+First, set your default domain in config:
+```bash
+nano ~/deployment_tools/config.sh
+# Add: DEFAULT_DOMAIN="yourdomain.com"
+```
+
+### 🚀 Full Deploy (More Options)
+
+```bash
+deploy --repo git@github.com:user/myapp.git \
        --subdomain myapp \
        --domain example.com
 ```

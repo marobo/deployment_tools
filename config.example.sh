@@ -24,6 +24,10 @@ DO_API_TOKEN=""
 # Default Values
 # ===========================================
 
+# Default domain for quick deploys (d command)
+# Example: DEFAULT_DOMAIN="example.com"
+DEFAULT_DOMAIN=""
+
 # Default application port inside container
 DEFAULT_PORT="8000"
 
