@@ -91,7 +91,7 @@ echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 
 # Get branch
-CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "master")
 echo -e "Branch: ${CURRENT_BRANCH}"
 
 if [[ "$RESTART_ONLY" == "true" ]]; then

@@ -93,7 +93,7 @@ projects --full
 | `--subdomain` | Subdomain name | Required |
 | `--domain` | Base domain | Required |
 | `--port` | App port in container | 8000 |
-| `--branch` | Git branch | main |
+| `--branch` | Git branch | master |
 | `--env-file` | Path to .env file | - |
 | `--project-name` | Custom folder name | subdomain |
 | `--skip-dns` | Skip DNS creation | false |
@@ -173,7 +173,7 @@ deployment_tools/
 
 ```bash
 # One-liner
-curl -sSL https://raw.githubusercontent.com/marobo/deployment_tools/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/marobo/deployment_tools/master/install.sh | bash
 
 # Manual
 git clone https://github.com/marobo/deployment_tools.git ~/deployment_tools

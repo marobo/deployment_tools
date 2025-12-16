@@ -15,7 +15,7 @@ Simple deployment scripts for Docker + Traefik servers. Deploy any project with 
 ### One-Command Install
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/marobo/deployment_tools/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/marobo/deployment_tools/master/install.sh | bash
 ```
 
 ### Manual Install
@@ -65,7 +65,7 @@ deploy --repo git@github.com:YOU_GIT_USERNAME/myapp.git \
 | `--subdomain` | Subdomain name | Required |
 | `--domain` | Base domain | Required |
 | `--port` | App port in container | 8000 |
-| `--branch` | Git branch | main |
+| `--branch` | Git branch | master |
 | `--env-file` | Path to .env file | - |
 | `--project-name` | Custom folder name | subdomain |
 | `--skip-dns` | Skip DNS creation | false |
