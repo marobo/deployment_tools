@@ -1,6 +1,6 @@
 #!/bin/bash
 # install.sh - Install deployment tools on your server
-# Usage: curl -sSL https://raw.githubusercontent.com/YOUR_USER/deploy-tools/main/install.sh | bash
+# Usage: curl -sSL https://raw.githubusercontent.com/marobo/deployment_tools/master/install.sh | bash
 
 set -e
 
@@ -12,13 +12,13 @@ CYAN='\033[0;36m'
 NC='\033[0m'
 
 # Configuration - UPDATE THIS WITH YOUR REPO URL
-REPO_URL="${DEPLOY_TOOLS_REPO:-https://github.com/YOUR_USERNAME/deployment-scripts.git}"
-INSTALL_DIR="$HOME/.deploy-tools"
+REPO_URL="${DEPLOY_TOOLS_REPO:-https://github.com/your_git_username/deployment_tools.git}"
+INSTALL_DIR="$HOME/your_username/deployment_tools"
 BIN_DIR="/usr/local/bin"
 
 echo ""
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${CYAN}  🛠️  Deploy Tools Installer${NC}"
+echo -e "${CYAN}  🛠️  Deployment Tools Installer${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
@@ -52,7 +52,7 @@ if [[ -d "$INSTALL_DIR" ]]; then
     echo -e "${GREEN}📥 Updating existing installation...${NC}"
     cd "$INSTALL_DIR"
     git fetch origin
-    git reset --hard origin/main
+    git reset --hard origin/master
 else
     echo -e "${GREEN}📥 Cloning deploy-tools...${NC}"
     git clone "$REPO_URL" "$INSTALL_DIR"
