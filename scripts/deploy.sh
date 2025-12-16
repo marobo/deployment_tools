@@ -86,7 +86,7 @@ done
 # Set derived values
 PROJECT_NAME="${PROJECT_NAME:-$SUBDOMAIN}"
 FULL_DOMAIN="${SUBDOMAIN}.${BASE_DOMAIN}"
-PROJECT_DIR="${PROJECTS_DIR}/${PROJECT_NAME}"
+PROJECT_DIR="${HOME}/projects/${PROJECT_NAME}"
 
 # Validation
 if [[ -z "$REPO_URL" ]] || [[ -z "$SUBDOMAIN" ]] || [[ -z "$BASE_DOMAIN" ]]; then
