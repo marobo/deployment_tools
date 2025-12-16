@@ -14,7 +14,7 @@ NC='\033[0m'
 # Configuration
 REPO_URL="${DEPLOY_TOOLS_REPO:-https://github.com/marobo/deployment_tools.git}"
 INSTALL_DIR="$HOME/deployment_tools"
-BIN_DIR="/usr/local/bin"
+BIN_DIR="$HOME/.local/bin"
 
 echo ""
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -69,33 +69,45 @@ if [[ ! -f "$INSTALL_DIR/config.sh" ]]; then
     echo -e "${YELLOW}   ⚠️  Edit $INSTALL_DIR/config.sh with your settings${NC}"
 fi
 
-# Create symlinks (may need sudo)
+# Create bin directory and symlinks
 echo -e "${GREEN}🔗 Creating command symlinks...${NC}"
+mkdir -p "$BIN_DIR"
 
 create_symlink() {
     local script="$1"
     local cmd="$2"
     
     # Remove existing symlink if it exists
-    if [[ -L "$BIN_DIR/$cmd" ]]; then
-        if [[ -w "$BIN_DIR" ]]; then
-            rm "$BIN_DIR/$cmd"
-        else
-            sudo rm "$BIN_DIR/$cmd"
-        fi
-    fi
-    
-    if [[ -w "$BIN_DIR" ]]; then
-        ln -sf "$INSTALL_DIR/scripts/$script" "$BIN_DIR/$cmd"
-    else
-        sudo ln -sf "$INSTALL_DIR/scripts/$script" "$BIN_DIR/$cmd"
-    fi
+    rm -f "$BIN_DIR/$cmd" 2>/dev/null
+    ln -sf "$INSTALL_DIR/scripts/$script" "$BIN_DIR/$cmd"
     echo -e "   ✅ $cmd → $INSTALL_DIR/scripts/$script"
 }
 
 create_symlink "deploy.sh" "deploy"
 create_symlink "update.sh" "update"
 create_symlink "projects.sh" "projects"
+
+# Ensure ~/.local/bin is in PATH
+if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+    echo -e "${GREEN}📝 Adding ~/.local/bin to PATH...${NC}"
+    
+    # Add to .bashrc if it exists
+    if [[ -f "$HOME/.bashrc" ]]; then
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
+    fi
+    
+    # Add to .zshrc if it exists
+    if [[ -f "$HOME/.zshrc" ]]; then
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.zshrc"
+    fi
+    
+    # Add to .profile as fallback
+    if [[ -f "$HOME/.profile" ]]; then
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.profile"
+    fi
+    
+    export PATH="$HOME/.local/bin:$PATH"
+fi
 
 # Done
 echo ""
@@ -104,6 +116,7 @@ echo -e "${GREEN}  ✅ Installation Complete!${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 echo -e "  Installed to: ${INSTALL_DIR}"
+echo -e "  Commands in:  ${BIN_DIR}"
 echo ""
 echo -e "  ${YELLOW}Next steps:${NC}"
 echo -e "  1. Edit config: ${CYAN}nano $INSTALL_DIR/config.sh${NC}"
