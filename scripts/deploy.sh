@@ -760,17 +760,17 @@ deploy_containers() {
     docker network create "$TRAEFIK_NETWORK" 2>/dev/null || true
     
     echo -e "   Stopping existing containers..."
-    docker compose down --remove-orphans 2>/dev/null || true
+    docker-compose down --remove-orphans 2>/dev/null || true
     
     echo -e "   Building..."
     if [[ "$FORCE_REBUILD" == "true" ]]; then
-        docker compose build --no-cache
+        docker-compose build --no-cache
     else
-        docker compose build
+        docker-compose build
     fi
     
     echo -e "   Starting..."
-    docker compose up -d
+    docker-compose up -d
     
     echo -e "   ${GREEN}✅ Containers deployed${NC}"
     echo ""
@@ -783,13 +783,13 @@ health_check() {
     cd "$PROJECT_DIR"
     sleep 3
     
-    CONTAINER_STATUS=$(docker compose ps --format "{{.State}}" 2>/dev/null | head -1)
+    CONTAINER_STATUS=$(docker-compose ps --format "{{.State}}" 2>/dev/null | head -1)
     
     if [[ "$CONTAINER_STATUS" == "running" ]]; then
         echo -e "   ${GREEN}✅ Container is running${NC}"
     else
         echo -e "   ${RED}❌ Container issue${NC}"
-        docker compose logs --tail=15
+        docker-compose logs --tail=15
         exit 1
     fi
     
@@ -816,8 +816,8 @@ print_summary() {
     echo -e "  📁 Dir: ${PROJECT_DIR}"
     echo ""
     echo -e "  Commands:"
-    echo -e "  ├─ Logs:    cd ${PROJECT_DIR} && docker compose logs -f"
-    echo -e "  ├─ Restart: cd ${PROJECT_DIR} && docker compose restart"
+    echo -e "  ├─ Logs:    cd ${PROJECT_DIR} && docker-compose logs -f"
+    echo -e "  ├─ Restart: cd ${PROJECT_DIR} && docker-compose restart"
     echo -e "  └─ Update:  update ${PROJECT_NAME}"
     echo ""
 }
