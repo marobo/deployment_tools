@@ -11,9 +11,9 @@ YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
-# Configuration - UPDATE THIS WITH YOUR REPO URL
-REPO_URL="${DEPLOY_TOOLS_REPO:-https://github.com/your_git_username/deployment_tools.git}"
-INSTALL_DIR="$HOME/your_username/deployment_tools"
+# Configuration
+REPO_URL="${DEPLOY_TOOLS_REPO:-https://github.com/marobo/deployment_tools.git}"
+INSTALL_DIR="$HOME/deployment_tools"
 BIN_DIR="/usr/local/bin"
 
 echo ""
