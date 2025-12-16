@@ -28,5 +28,5 @@ DO_API_TOKEN=""
 DEFAULT_PORT="8000"
 
 # Default git branch to deploy
-DEFAULT_BRANCH="main"
+DEFAULT_BRANCH="master"
 
