@@ -248,12 +248,11 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy application
+# Copy application first (includes submodules)
 COPY . .
+
+# Install all requirements (including from subdirectories)
+RUN find . -name "requirements.txt" -exec pip install --no-cache-dir -r {} \;
 
 # Make entrypoint executable
 COPY entrypoint.sh /entrypoint.sh
@@ -285,12 +284,11 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy application
+# Copy application first (includes submodules)
 COPY . .
+
+# Install all requirements (including from subdirectories)
+RUN find . -name "requirements.txt" -exec pip install --no-cache-dir -r {} \;
 
 # Make entrypoint executable
 COPY entrypoint.sh /entrypoint.sh
@@ -328,12 +326,12 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt gunicorn
-
-# Copy application
+# Copy application first (includes submodules)
 COPY . .
+
+# Install all requirements (including from subdirectories) + gunicorn
+RUN find . -name "requirements.txt" -exec pip install --no-cache-dir -r {} \; && \
+    pip install --no-cache-dir gunicorn
 
 # Make entrypoint executable
 COPY entrypoint.sh /entrypoint.sh
@@ -365,12 +363,11 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy application
+# Copy application first (includes submodules)
 COPY . .
+
+# Install all requirements (including from subdirectories)
+RUN find . -name "requirements.txt" -exec pip install --no-cache-dir -r {} \;
 
 # Make entrypoint executable
 COPY entrypoint.sh /entrypoint.sh
@@ -396,17 +393,15 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copy dependency files
-COPY pyproject.toml* Pipfile* ./
+# Copy application first (includes submodules)
+COPY . .
 
 # Install pip tools and dependencies
 RUN pip install --no-cache-dir pip --upgrade && \
     if [ -f "pyproject.toml" ]; then pip install --no-cache-dir .; \
     elif [ -f "Pipfile" ]; then pip install --no-cache-dir pipenv && pipenv install --system; \
-    fi
-
-# Copy application
-COPY . .
+    fi && \
+    find . -name "requirements.txt" -exec pip install --no-cache-dir -r {} \;
 
 # Make entrypoint executable
 COPY entrypoint.sh /entrypoint.sh
