@@ -1,0 +1,21 @@
+# Configuration with secrets
+config.sh
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor backup files
+*~
+*.swp
+*.swo
+*.bak
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
