@@ -195,43 +195,94 @@ setup_environment() {
         cp ".env.example" ".env"
         echo -e "   ${YELLOW}⚠️  Copied .env.example → .env (edit with real values!)${NC}"
     else
-        touch .env
-        echo -e "   ${YELLOW}⚠️  Created empty .env file${NC}"
+        # Generate Django .env template
+        echo -e "   Generating Django .env template..."
+        cat > .env << 'ENVFILE'
+# Django Settings
+DEBUG=False
+SECRET_KEY=change-me-to-a-random-secret-key
+ALLOWED_HOSTS=localhost,127.0.0.1
+
+# Database (PostgreSQL example)
+DATABASE_URL=postgres://user:password@db:5432/dbname
+# Or individual settings:
+# DB_NAME=dbname
+# DB_USER=user
+# DB_PASSWORD=password
+# DB_HOST=db
+# DB_PORT=5432
+
+# Static/Media files
+# STATIC_URL=/static/
+# MEDIA_URL=/media/
+ENVFILE
+        echo -e "   ${YELLOW}⚠️  Generated .env template - edit with real values!${NC}"
     fi
     echo ""
 }
 
-# Step 4: Setup Dockerfile from template
+# Step 4: Setup Dockerfile and entrypoint from template
 setup_dockerfile() {
     echo -e "${GREEN}🐍 Step 4: Setting up Dockerfile...${NC}"
     
     cd "$PROJECT_DIR"
     
-    # Skip if Dockerfile already exists
-    if [[ -f "Dockerfile" ]] || [[ -f "dockerfile" ]]; then
-        echo -e "   ${GREEN}✅ Dockerfile already exists${NC}"
-        echo ""
-        return 0
-    fi
-    
     # Check if it's a Django project
-    if [[ -f "requirements.txt" ]] || [[ -f "manage.py" ]]; then
-        echo -e "   📦 Detected: ${CYAN}Django${NC} project"
-        
-        if [[ -d "$TEMPLATES_DIR/django" ]]; then
-            cp "$TEMPLATES_DIR/django/Dockerfile" .
-            cp "$TEMPLATES_DIR/django/entrypoint.sh" .
-            chmod +x entrypoint.sh
-            echo -e "   ${GREEN}✅ Dockerfile and entrypoint.sh created from template${NC}"
-        else
-            echo -e "   ${RED}❌ Django template not found at: $TEMPLATES_DIR/django${NC}"
-            exit 1
-        fi
-    else
+    if [[ ! -f "requirements.txt" ]] && [[ ! -f "manage.py" ]]; then
         echo -e "   ${RED}❌ Could not detect Django project${NC}"
         echo -e "   ${YELLOW}   No requirements.txt or manage.py found${NC}"
         echo -e "   ${YELLOW}   Please add a Dockerfile manually${NC}"
         exit 1
+    fi
+    
+    echo -e "   📦 Detected: ${CYAN}Django${NC} project"
+    
+    # Setup Dockerfile
+    if [[ -f "Dockerfile" ]] || [[ -f "dockerfile" ]]; then
+        echo -e "   ${GREEN}✅ Dockerfile already exists${NC}"
+    else
+        if [[ -f "$TEMPLATES_DIR/django/Dockerfile" ]]; then
+            cp "$TEMPLATES_DIR/django/Dockerfile" .
+            echo -e "   ${GREEN}✅ Dockerfile created from template${NC}"
+        else
+            echo -e "   ${RED}❌ Django Dockerfile template not found${NC}"
+            exit 1
+        fi
+    fi
+    
+    # Setup entrypoint.sh (always ensure it exists for Django)
+    if [[ -f "entrypoint.sh" ]]; then
+        echo -e "   ${GREEN}✅ entrypoint.sh already exists${NC}"
+    else
+        if [[ -f "$TEMPLATES_DIR/django/entrypoint.sh" ]]; then
+            cp "$TEMPLATES_DIR/django/entrypoint.sh" .
+            chmod +x entrypoint.sh
+            echo -e "   ${GREEN}✅ entrypoint.sh created from template${NC}"
+        else
+            # Generate inline if template not found
+            echo -e "   Generating entrypoint.sh..."
+            cat > entrypoint.sh << 'ENTRYPOINT'
+#!/bin/bash
+set -e
+
+# Wait for database to be ready
+echo "Waiting for database..."
+sleep 3
+
+# Run database migrations
+echo "Running database migrations..."
+python manage.py migrate --noinput || true
+
+# Collect static files
+echo "Collecting static files..."
+python manage.py collectstatic --noinput || true
+
+# Execute the main command
+exec "$@"
+ENTRYPOINT
+            chmod +x entrypoint.sh
+            echo -e "   ${GREEN}✅ entrypoint.sh generated${NC}"
+        fi
     fi
     echo ""
 }
