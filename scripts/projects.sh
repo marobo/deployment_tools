@@ -4,37 +4,16 @@
 
 set -e
 
-# Load config (resolve symlinks to find real script location)
-SCRIPT_PATH="${BASH_SOURCE[0]}"
-while [[ -L "$SCRIPT_PATH" ]]; do
-    LINK_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
-    SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
-    [[ "$SCRIPT_PATH" != /* ]] && SCRIPT_PATH="$LINK_DIR/$SCRIPT_PATH"
-done
-SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
-CONFIG_FILE="$(dirname "$SCRIPT_DIR")/config.sh"
+# Load shared functions
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/common.sh"
 
-if [[ -f "$CONFIG_FILE" ]]; then
-    source "$CONFIG_FILE"
-fi
-
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
-GRAY='\033[0;90m'
-NC='\033[0m'
-
-# Defaults
-PROJECTS_DIR="${PROJECTS_DIR:-$HOME/projects}"
+SCRIPT_DIR=$(resolve_script_dir)
+load_config "$SCRIPT_DIR"
 
 # Help
 show_help() {
-    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${CYAN}  📦 List Deployed Projects${NC}"
-    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo ""
+    print_header "📦 List Deployed Projects"
     echo "Usage: projects [OPTIONS]"
     echo ""
     echo "Options:"
@@ -60,11 +39,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-echo ""
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${CYAN}  📦 Deployed Projects${NC}"
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo ""
+print_wide_header "📦 Deployed Projects"
 
 if [[ ! -d "$PROJECTS_DIR" ]]; then
     echo -e "${YELLOW}No projects directory at ${PROJECTS_DIR}${NC}"
@@ -113,8 +88,7 @@ for PROJECT in $PROJECTS; do
     
     if [[ "$SHOW_STATUS" == "true" ]]; then
         if [[ -f "${PROJECT_PATH}/docker-compose.yml" ]]; then
-            cd "$PROJECT_PATH"
-            STATUS=$(docker-compose ps --format "{{.State}}" 2>/dev/null | head -1)
+            STATUS=$(check_container_status "$PROJECT_PATH")
             
             case "$STATUS" in
                 "running")
@@ -136,7 +110,7 @@ for PROJECT in $PROJECTS; do
     
     if [[ "$SHOW_URLS" == "true" ]]; then
         if [[ -f "${PROJECT_PATH}/docker-compose.yml" ]]; then
-            URL=$(grep -oP "Host\(\`\K[^\`]+" "${PROJECT_PATH}/docker-compose.yml" 2>/dev/null | head -1)
+            URL=$(get_project_url "${PROJECT_PATH}/docker-compose.yml")
             if [[ -n "$URL" ]]; then
                 printf "${CYAN}%-40s${NC}" "https://${URL}"
             else
@@ -165,4 +139,3 @@ if [[ "$SHOW_STATUS" == "true" ]]; then
     echo -e "  Running: ${GREEN}${RUNNING}${NC} | Stopped: ${RED}${STOPPED}${NC}"
 fi
 echo ""
-

@@ -9,35 +9,16 @@
 
 set -e
 
-# Load config
-SCRIPT_PATH="${BASH_SOURCE[0]}"
-while [[ -L "$SCRIPT_PATH" ]]; do
-    LINK_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
-    SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
-    [[ "$SCRIPT_PATH" != /* ]] && SCRIPT_PATH="$LINK_DIR/$SCRIPT_PATH"
-done
-SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
-CONFIG_FILE="$(dirname "$SCRIPT_DIR")/config.sh"
+# Load shared functions
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/common.sh"
 
-[[ -f "$CONFIG_FILE" ]] && source "$CONFIG_FILE"
-
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
-NC='\033[0m'
-
-# Check for default domain in config
-DEFAULT_DOMAIN="${DEFAULT_DOMAIN:-}"
+SCRIPT_DIR=$(resolve_script_dir)
+load_config "$SCRIPT_DIR"
 
 # Help
 if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]] || [[ -z "$1" ]]; then
-    echo ""
-    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${CYAN}  ⚡ Quick Deploy${NC}"
-    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo ""
+    print_header "⚡ Quick Deploy"
     echo "Usage: d <git-url> [subdomain]"
     echo ""
     echo "Examples:"
@@ -60,10 +41,9 @@ fi
 REPO_URL="$1"
 SUBDOMAIN="$2"
 
-# Extract repo name from URL to use as subdomain
+# Extract repo name from URL using basename (simple and portable)
 if [[ -z "$SUBDOMAIN" ]]; then
-    # Handle git@github.com:user/repo.git or https://github.com/user/repo.git
-    SUBDOMAIN=$(echo "$REPO_URL" | sed -E 's|.*/([^/]+)(\.git)?$|\1|' | sed 's/\.git$//')
+    SUBDOMAIN=$(get_repo_name "$REPO_URL")
 fi
 
 # Clean subdomain (lowercase, replace underscores with dashes)
@@ -86,10 +66,7 @@ if [[ -z "$DEFAULT_DOMAIN" ]]; then
 fi
 
 # Confirm
-echo ""
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${CYAN}  ⚡ Quick Deploy${NC}"
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+print_header "⚡ Quick Deploy"
 echo -e "  Repo:   ${REPO_URL}"
 echo -e "  URL:    ${GREEN}https://${SUBDOMAIN}.${DEFAULT_DOMAIN}${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -107,4 +84,3 @@ exec "${SCRIPT_DIR}/deploy.sh" \
     --repo "$REPO_URL" \
     --subdomain "$SUBDOMAIN" \
     --domain "$DEFAULT_DOMAIN"
-

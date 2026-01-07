@@ -8,7 +8,7 @@ This document captures the planning conversation and design decisions for this d
 
 **User's Setup:**
 - Digital Ocean server with Traefik for reverse proxy
-- Multiple projects can be deployed to the same server
+- Multiple Django projects can be deployed to the same server
 - Server structure:
   ```
   /home/your_username/
@@ -26,7 +26,7 @@ This document captures the planning conversation and design decisions for this d
   ```
 
 **Desired Features:**
-1. Clone project into server
+1. Clone Django project into server
 2. Create subdomain pointed to DNS
 3. Setup Docker and run containers
 4. Integrate with Traefik for SSL/routing
@@ -39,6 +39,8 @@ This document captures the planning conversation and design decisions for this d
 
 | Script | Purpose |
 |--------|---------|
+| `common.sh` | Shared functions, colors, config loading |
+| `d.sh` | Quick deploy: one-liner deployment |
 | `deploy.sh` | Full deployment: clone repo, create DNS, setup Docker, deploy |
 | `update.sh` | Quick update: git pull + rebuild containers |
 | `projects.sh` | List all projects with status and URLs |
@@ -46,16 +48,28 @@ This document captures the planning conversation and design decisions for this d
 
 ### Key Features
 
-1. **DNS Automation** - Uses DigitalOcean API to create A records automatically
-2. **Traefik Integration** - Auto-generates docker-compose.yml with Traefik labels
-3. **Config-based** - All settings in `config.sh` (not tracked in git)
-4. **Idempotent** - Safe to run multiple times
+1. **Django-focused** - Auto-generates Dockerfile from templates for Django projects
+2. **DNS Automation** - Uses DigitalOcean API to create A records automatically
+3. **Traefik Integration** - Auto-generates docker-compose.yml with Traefik labels
+4. **Config-based** - All settings in `config.sh` (not tracked in git)
+5. **Idempotent** - Safe to run multiple times
+6. **Shared Library** - Common functions in `common.sh` to reduce duplication
 
 ---
 
 ## 📖 Usage Examples
 
-### Deploy New Project
+### Quick Deploy (Recommended)
+
+```bash
+# Just the repo URL - subdomain auto-detected from repo name
+d git@github.com:user/myapp.git
+
+# Or specify a custom subdomain
+d git@github.com:user/myapp.git api
+```
+
+### Full Deploy
 
 ```bash
 deploy --repo git@github.com:your_git_user_name/myapp.git \
@@ -111,36 +125,33 @@ projects --full
 
 2. Setup Repository
    ├── Clone if new
-   └── Pull if exists
+   ├── Pull if exists
+   └── Update git submodules
 
 3. Setup Environment
    ├── Copy provided .env
    ├── Use existing .env
    └── Or copy from .env.example
 
-4. Setup Docker Compose
+4. Setup Dockerfile (Django Template)
+   ├── Check if Dockerfile exists
+   ├── Detect Django project (requirements.txt or manage.py)
+   └── Copy Dockerfile + entrypoint.sh from templates/django/
+
+5. Setup Docker Compose
    ├── Use existing if has Traefik labels
    └── Generate new with Traefik config
 
-5. Deploy Containers
+6. Deploy Containers
    ├── Create Traefik network
    ├── Stop existing containers
    ├── Build image
    └── Start containers
 
-6. Health Check
+7. Health Check
    ├── Verify container running
    └── Test HTTPS endpoint
 ```
-
----
-
-## 🚫 Features Excluded (Not Needed Now)
-
-- **GitHub Webhook Receiver** - Auto-deploy on push (can add later)
-  - Would run on port 9000
-  - Receives POST from GitHub
-  - Triggers update script
 
 ---
 
@@ -148,16 +159,42 @@ projects --full
 
 ```
 deployment_tools/
-├── install.sh           # One-command installer
-├── config.example.sh    # Configuration template
-├── README.md            # User documentation
-├── PLANNING.md          # This file
-├── .gitignore           # Ignores config.sh
-└── scripts/
-    ├── deploy.sh        # Full deployment
-    ├── update.sh        # Quick update
-    └── projects.sh      # List projects
+├── install.sh              # One-command installer
+├── config.example.sh       # Configuration template
+├── config.sh               # Your configuration (gitignored)
+├── README.md               # User documentation
+├── PLANNING.md             # This file
+├── .gitignore              # Ignores config.sh
+├── scripts/
+│   ├── common.sh           # Shared functions & utilities
+│   ├── d.sh                # Quick deploy command
+│   ├── deploy.sh           # Full deployment script
+│   ├── update.sh           # Quick update script
+│   └── projects.sh         # List projects script
+└── templates/
+    └── django/             # Django project templates
+        ├── Dockerfile      # Python 3.11 + Gunicorn
+        └── entrypoint.sh   # Migrations + collectstatic
 ```
+
+---
+
+## 🐍 Django Template Details
+
+The `templates/django/` directory contains:
+
+### Dockerfile
+- Base image: `python:3.11-slim`
+- Installs system deps for PostgreSQL (`libpq-dev`)
+- Installs all `requirements.txt` files (including submodules)
+- Exposes port 8000
+- Runs with Gunicorn
+
+### entrypoint.sh
+- Waits for database (3 second delay)
+- Runs `python manage.py migrate --noinput`
+- Runs `python manage.py collectstatic --noinput`
+- Executes the main command (Gunicorn)
 
 ---
 
@@ -193,8 +230,8 @@ nano ~/deployment_tools/config.sh
 - [ ] GitHub webhook for auto-deploy
 - [ ] Multi-server support
 - [ ] Blue-green deployments
+- [ ] Support for other frameworks (FastAPI, Flask, etc.)
 
 ---
 
-*Generated from planning conversation - December 2024*
-
+*Last updated: January 2025*

@@ -77,7 +77,6 @@ create_symlink() {
     local script="$1"
     local cmd="$2"
     
-    # Remove existing symlink if it exists
     rm -f "$BIN_DIR/$cmd" 2>/dev/null
     ln -sf "$INSTALL_DIR/scripts/$script" "$BIN_DIR/$cmd"
     echo -e "   ✅ $cmd → $INSTALL_DIR/scripts/$script"
@@ -88,25 +87,24 @@ create_symlink "deploy.sh" "deploy"
 create_symlink "update.sh" "update"
 create_symlink "projects.sh" "projects"
 
-# Ensure ~/.local/bin is in PATH
+# Add PATH to shell config (only if not already present)
+add_to_path() {
+    local file="$1"
+    local line='export PATH="$HOME/.local/bin:$PATH"'
+    
+    if [[ -f "$file" ]]; then
+        if ! grep -qF '.local/bin' "$file"; then
+            echo "$line" >> "$file"
+            echo -e "   Added PATH to $file"
+        fi
+    fi
+}
+
 if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
     echo -e "${GREEN}📝 Adding ~/.local/bin to PATH...${NC}"
-    
-    # Add to .bashrc if it exists
-    if [[ -f "$HOME/.bashrc" ]]; then
-        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
-    fi
-    
-    # Add to .zshrc if it exists
-    if [[ -f "$HOME/.zshrc" ]]; then
-        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.zshrc"
-    fi
-    
-    # Add to .profile as fallback
-    if [[ -f "$HOME/.profile" ]]; then
-        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.profile"
-    fi
-    
+    add_to_path "$HOME/.bashrc"
+    add_to_path "$HOME/.zshrc"
+    add_to_path "$HOME/.profile"
     export PATH="$HOME/.local/bin:$PATH"
 fi
 
@@ -129,4 +127,3 @@ echo -e "  • deploy --help   ← Full options"
 echo -e "  • update --help"
 echo -e "  • projects --help"
 echo ""
-

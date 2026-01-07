@@ -1,6 +1,6 @@
 # 🚀 Deploy Tools
 
-Deploy any project with a **single command**.
+Deploy Django projects with a **single command**.
 
 ```bash
 d git@github.com:user/myapp.git
@@ -13,6 +13,7 @@ That's it. Seriously.
 ## Features
 
 - ⚡ **One-command deploy** - Just paste your git URL
+- 🐍 **Django-focused** - Auto-generates Dockerfile and entrypoint for Django
 - 🐳 **Docker + Traefik** - Automatic container deployment with reverse proxy
 - 🔒 **Auto SSL** - Let's Encrypt certificates via Traefik
 - 📡 **DNS Automation** - Auto-create DigitalOcean DNS records
@@ -47,10 +48,13 @@ nano ~/deployment_tools/config.sh
 
 ```bash
 # Where your projects are stored
-PROJECTS_DIR="/home/you_username/projects"
+PROJECTS_DIR="/home/your_username/projects"
 
 # Docker network (must match your Traefik setup)
 TRAEFIK_NETWORK="proxy"
+
+# Default domain for quick deploys
+DEFAULT_DOMAIN="example.com"
 
 # DigitalOcean API token (optional, for auto DNS)
 DO_API_TOKEN="dop_v1_xxxxx"
@@ -71,7 +75,7 @@ d git@github.com:user/myapp.git api
 First, set your default domain in config:
 ```bash
 nano ~/deployment_tools/config.sh
-# Add: DEFAULT_DOMAIN="yourdomain.com"
+# Set: DEFAULT_DOMAIN="yourdomain.com"
 ```
 
 ### 🚀 Full Deploy (More Options)
@@ -132,15 +136,27 @@ projects --full
 
 ```
 /home/your_username/
+├── deployment_tools/         # This toolkit
+│   ├── scripts/
+│   │   ├── common.sh         # Shared functions
+│   │   ├── d.sh              # Quick deploy
+│   │   ├── deploy.sh         # Full deploy
+│   │   ├── update.sh         # Update projects
+│   │   └── projects.sh       # List projects
+│   ├── templates/
+│   │   └── django/           # Django Dockerfile templates
+│   │       ├── Dockerfile
+│   │       └── entrypoint.sh
+│   └── config.sh             # Your configuration
 ├── traefik/
 │   └── docker-compose.yml    # Traefik reverse proxy
 └── projects/
     ├── myapp/
     │   ├── docker-compose.yml
     │   ├── Dockerfile
+    │   ├── entrypoint.sh
     │   └── .env
-    ├── another-app/
-    └── api-server/
+    └── another-app/
 ```
 
 ## Requirements
@@ -154,7 +170,16 @@ projects --full
 
 ### Project Requirements
 
-Your project needs a `Dockerfile`. If no `docker-compose.yml` exists, one will be generated automatically with Traefik labels.
+Your Django project needs:
+- `requirements.txt` or `manage.py` (for auto-detection)
+- If no `Dockerfile` exists, one will be generated from the Django template
+- If no `docker-compose.yml` exists, one will be generated with Traefik labels
+
+The auto-generated Dockerfile:
+- Uses Python 3.11
+- Runs database migrations automatically
+- Collects static files
+- Runs with Gunicorn on port 8000
 
 Example project `docker-compose.yml`:
 
@@ -259,7 +284,16 @@ docker compose logs -f
 
 Use `--skip-dns` and create records manually, or wait 5-10 minutes.
 
+### Django migrations failing
+
+Check if your database is accessible and the `.env` file has correct credentials:
+
+```bash
+cd /home/your_username/projects/myapp
+cat .env
+docker compose exec web python manage.py migrate --check
+```
+
 ## License
 
 MIT
-
