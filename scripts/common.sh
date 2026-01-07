@@ -13,20 +13,6 @@ GRAY='\033[0;90m'
 NC='\033[0m'
 
 # ===========================================
-# Resolve script location (handles symlinks)
-# Returns the real directory of the calling script
-# ===========================================
-resolve_script_dir() {
-    local script_path="${BASH_SOURCE[1]:-${BASH_SOURCE[0]}}"
-    while [[ -L "$script_path" ]]; do
-        local link_dir="$(cd "$(dirname "$script_path")" && pwd)"
-        script_path="$(readlink "$script_path")"
-        [[ "$script_path" != /* ]] && script_path="$link_dir/$script_path"
-    done
-    echo "$(cd "$(dirname "$script_path")" && pwd)"
-}
-
-# ===========================================
 # Load configuration
 # ===========================================
 load_config() {
